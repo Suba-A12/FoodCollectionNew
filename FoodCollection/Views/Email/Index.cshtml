@@ -1,0 +1,26 @@
+﻿@model FoodCollection.Models.EmailModel
+
+<h2>Send Email</h2>
+
+<form asp-action="Index" method="post">
+    <div>
+        <label>Email To:</label>
+        <input asp-for="ToEmail" class="form-control" />
+    </div>
+    <div>
+        <label>Subject:</label>
+        <input asp-for="Subject" class="form-control" />
+    </div>
+    <div>
+        <label>Message:</label>
+        <textarea asp-for="Message" class="form-control"></textarea>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+<br />
+<br />
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-success">@ViewBag.Message</div>
+}

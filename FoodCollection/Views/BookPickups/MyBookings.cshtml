@@ -1,0 +1,140 @@
+﻿@* @model IEnumerable<FoodCollection.Models.BookPickup>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EventName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.CustomerId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BookPickupId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BookPickupId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BookPickupId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+ *@
+
+@model IEnumerable<FoodCollection.Models.BookPickup>
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">My Bookings</h2>
+        <a asp-action="Create" class="btn btn-outline-success">
+            <i class="bi bi-pencil-square me-1"></i> Create New
+        </a>
+    </div>
+
+    <div class="table-responsive shadow rounded-3">
+        <table class="table table-hover align-middle table-striped">
+            <thead class="bg-success text-white">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.EventName)</th>
+                    <th>@Html.DisplayNameFor(model => model.EventAddress)</th>
+                    <th>@Html.DisplayNameFor(model => model.BookDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.BookTime)</th>
+                    <th>@Html.DisplayNameFor(model => model.BookStatus)</th>
+                    <th>@Html.DisplayNameFor(model => model.TotalAmount)</th>
+                    <th>@Html.DisplayNameFor(model => model.PaymentStatus)</th>
+                    <th>@Html.DisplayNameFor(model => model.Customer)</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.EventName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.EventAddress)</td>
+                        <td>@item.BookDate.ToString("yyyy-MM-dd")</td>
+                        <td>@item.BookTime</td>
+                        <td>
+                            <span class="badge bg-@(item.BookStatus == "Confirmed" ? "success" : "warning")">
+                                @item.BookStatus
+                            </span>
+                        </td>
+                        <td>$@item.TotalAmount.ToString("0.00")</td>
+                        <td>
+                            <span class="badge bg-@(item.PaymentStatus == "Paid" ? "primary" : "secondary")">
+                                @item.PaymentStatus
+                            </span>
+                        </td>
+                        <td>@item.Customer?.CustomerId</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.BookPickupId" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.BookPickupId" class="btn btn-sm btn-outline-info" title="Details">
+                                    <i class="bi bi-info-circle"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.BookPickupId" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

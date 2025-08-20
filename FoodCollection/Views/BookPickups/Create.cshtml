@@ -1,0 +1,159 @@
+﻿@* @model FoodCollection.Models.BookPickup
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>BookPickup</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="EventName" class="control-label"></label>
+                <input asp-for="EventName" class="form-control" />
+                <span asp-validation-for="EventName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventAddress" class="control-label"></label>
+                <input asp-for="EventAddress" class="form-control" />
+                <span asp-validation-for="EventAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookDate" class="control-label"></label>
+                <input asp-for="BookDate" class="form-control" />
+                <span asp-validation-for="BookDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookTime" class="control-label"></label>
+                <input asp-for="BookTime" class="form-control" />
+                <span asp-validation-for="BookTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookStatus" class="control-label"></label>
+                <input asp-for="BookStatus" class="form-control" />
+                <span asp-validation-for="BookStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalAmount" class="control-label"></label>
+                <input asp-for="TotalAmount" class="form-control" />
+                <span asp-validation-for="TotalAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PaymentStatus" class="control-label"></label>
+                <input asp-for="PaymentStatus" class="form-control" />
+                <span asp-validation-for="PaymentStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerId" class="control-label"></label>
+                <select asp-for="CustomerId" class ="form-control" asp-items="ViewBag.CustomerId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+@model FoodCollection.Models.BookPickup
+
+@{
+    ViewData["Title"] = "Create Pickup Booking";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white d-flex align-items-center justify-content-between rounded-top-4">
+                    <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Create Pickup</h5>
+                    <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="EventName" class="form-label">Event Name</label>
+                                <input asp-for="EventName" class="form-control" placeholder="Enter event name" />
+                                <span asp-validation-for="EventName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="EventAddress" class="form-label">Event Address</label>
+                                <input asp-for="EventAddress" class="form-control" placeholder="Enter pickup address" />
+                                <span asp-validation-for="EventAddress" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="BookDate" class="form-label">Pickup Date</label>
+                                <input asp-for="BookDate" type="date" class="form-control" />
+                                <span asp-validation-for="BookDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="BookTime" class="form-label">Pickup Time</label>
+                                <input asp-for="BookTime" type="time" class="form-control" />
+                                <span asp-validation-for="BookTime" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="BookStatus" class="form-label">Booking Status</label>
+                                <input asp-for="BookStatus" class="form-control" value="Pending" readonly/>
+                                <span asp-validation-for="BookStatus" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="TotalAmount" class="form-label">Total Amount</label>
+                                <input asp-for="TotalAmount" class="form-control" value="35.00" readonly/>
+                                <span asp-validation-for="TotalAmount" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PaymentStatus" class="form-label">Payment Status</label>
+                                <input asp-for="PaymentStatus" class="form-control" value="Unpaid" readonly/>
+                                <span asp-validation-for="PaymentStatus" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CustomerId" class="form-label">Customer</label>
+                                <select asp-for="CustomerId" class="form-select" asp-items="ViewBag.CustomerId"></select>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="bi bi-pencil-square me-1"></i> Book Pickup
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

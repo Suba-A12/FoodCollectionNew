@@ -1,0 +1,154 @@
+﻿@* @model List<FoodCollection.Models.Payment> *@
+@model FoodCollection.Models.DashboardVM
+
+@{
+    // ViewData["Title"] = "Payment Chart";
+    // var dateLabels = string.Join(",", Model.Select(p => $"'{p.Date.ToString("yyyy-MM-dd")}'"));
+    // var amountData = string.Join(",", Model.Select(p => p.Amount));
+    ViewData["Title"] = "Dashboard";
+    var dateLabels = string.Join(",", Model.payments.Select(p => $"'{p.Date.ToString("yyyy-MM-dd")}'"));
+    var amountData = string.Join(",", Model.payments.Select(p => p.Amount));
+    var fooditems = string.Join(",", Model.foodItems.Select(p => p.FoodItemId));
+    var countfooditems = string.Join(",", Model.foodItems.Select(p => p.CountFoodItem));
+}
+
+<!DOCTYPE html>
+    <head>
+		<meta charset="utf-8" />
+		<title>
+			@ViewData["Title"]
+		</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>;
+    <style>
+        .tSalesstyle{
+            top: 150px;
+            height: 150px;
+            width: 200px;
+            background-color: gray;
+            border: solid 1px;
+            border-radius: 1%;
+            position: absolute;
+        }
+        .Paymentstyle{
+            top: 300px;
+            height : 300px;
+            width : 500px;
+            border: solid 1px;
+            border-radius: 1%;
+            position: absolute;
+        }
+
+        .fooditemstyle{
+            top: 300px;
+            left: 700px;
+            height: 300px;
+            width: 500px;
+            border: solid 1px;
+            border-radius: 1%;
+            position: absolute;
+        }
+    </style>
+    </head>
+    <body>
+        <div class=" =tSalesstyle">
+         <h1> Total Sales</h1>
+         <h2>@ViewBag.TotalSales</h2>
+        </div>
+        <!--PaymentReport-->
+    <div class ="Paymentstyle">
+    <div style="width: 80%; max-width: 700px; margin: auto;">
+        <h2>Payment Report</h2>
+        <canvas id="paymentChart"></canvas>
+
+        <script>
+            const ctx = document.getElementById('paymentChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(dateLabels)],
+                    datasets: [{
+                        label: 'Payment Amount',
+                        data: [@Html.Raw(amountData)],
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Payment per Date'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+    </div>
+    <!--FoodReport-->
+    <div class = "fooditemstyle">
+        <div style="width: 80%; max-width: 700px; margin: auto;">
+            <h2>Food Report</h2>
+            <canvas id="FoodChart" </canvas>
+
+            <script>
+                const ctv = document.getElementById('FoodChart').getContext('2d');
+                const chartctv = new Chart(ctv, {
+                    type: 'bar',
+                    data: {
+                        labels: [@Html.Raw(fooditems)],
+                        datasets: [{
+                            label: 'Count of Food Item',
+                            data: [@Html.Raw(countfooditems)],
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Popular FoodItem'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'CountFoodItem'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'FoodItemId'
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</body>
+</html>

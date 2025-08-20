@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Payment Confirmation";
+}
+
+<h2>Confirm Payment</h2>
+<p>Amount to pay: <strong>$@ViewBag.Amount</strong></p>
+
+<form id="payment-form">
+    <button id="checkout-button">Pay with Stripe</button>
+</form>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe('@ViewBag.PublishableKey');
+
+    document.getElementById('checkout-button').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        fetch('/Payments/CreateCheckoutSession?paymentId=@ViewBag.PaymentId', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                return stripe.redirectToCheckout({ sessionId: data.id });
+            })
+            .catch(error => console.error('Error:', error));
+    });
+</script>

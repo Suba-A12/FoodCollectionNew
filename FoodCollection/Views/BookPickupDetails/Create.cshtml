@@ -1,0 +1,156 @@
+﻿@* @model FoodCollection.Models.BookPickupDetail
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>BookPickupDetail</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="QuantityLeft" class="control-label"></label>
+                <input asp-for="QuantityLeft" class="form-control" />
+                <span asp-validation-for="QuantityLeft" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpiryDate" class="control-label"></label>
+                <input asp-for="ExpiryDate" class="form-control" />
+                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookPickupId" class="control-label"></label>
+                <select asp-for="BookPickupId" class ="form-control" asp-items="ViewBag.BookPickupId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="FoodItemId" class="control-label"></label>
+                <select asp-for="FoodItemId" class ="form-control" asp-items="ViewBag.FoodItemId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+@model FoodCollection.Models.BookPickupDetail
+
+@{
+    ViewData["Title"] = "Add Food Item to Booking";
+}
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<form asp-action="Create" method="post" id="foodForm">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="QuantityLeft" class="form-label">Quantity</label>
+            <input type="number" id="QuantityLeft" class="form-control" placeholder="0" />
+        </div>
+
+        <div class="col-md-3">
+            <label for="ExpiryDate" class="form-label">Expiry Date</label>
+            <input type="date" id="ExpiryDate" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label for="FoodItemId" class="form-label">Food Item</label>
+            <select id="FoodItemId" class="form-select">
+                <option value="">-- Select Food Item --</option>
+                @foreach (var item in ViewBag.FoodItemList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button type="button" class="btn btn-success" id="addItemBtn">
+                <i class="bi bi-plus-circle"></i> Add
+            </button>
+        </div>
+    </div>
+
+    <!-- Textarea-like box (contenteditable div) -->
+    <div id="itemListBox" class="form-control mt-3" style="height:150px; overflow-y:auto;" contenteditable="false"></div>
+
+    <!-- Hidden input for posting to controller -->
+    <input type="hidden" id="itemList" name="ItemList" />
+
+    <span class="text-muted small">List of food items added to the booking.</span>
+
+    <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-lg me-1"></i> Payments
+        </button>
+    </div>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $("#addItemBtn").click(function () {
+            var qty = $("#QuantityLeft").val();
+            var exp = $("#ExpiryDate").val();
+            var foodText = $("#FoodItemId option:selected").text();
+            var foodVal = $("#FoodItemId").val();
+
+            if (!qty || !exp || !foodVal) {
+                alert("Please fill all fields before adding.");
+                return;
+            }
+
+            // Create item row with remove button
+            var itemHtml = `<div class="d-flex justify-content-between align-items-center border p-1 mb-1 bg-light">
+                                <span>${qty} - ${foodText} (Expiry: ${exp})</span>
+                                <button type="button" class="btn btn-sm btn-danger removeItem">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </div>`;
+
+            $("#itemListBox").append(itemHtml);
+
+            // Update hidden field for backend
+            updateHiddenInput();
+
+            // Clear inputs
+            $("#QuantityLeft").val("");
+            $("#ExpiryDate").val("");
+            $("#FoodItemId").val("");
+        });
+
+        // Handle ❌ remove
+        $(document).on("click", ".removeItem", function () {
+            $(this).closest("div").remove();
+            updateHiddenInput();
+        });
+
+        // Update hidden input (plain text list)
+        function updateHiddenInput() {
+            var items = [];
+            $("#itemListBox span").each(function () {
+                items.push($(this).text());
+            });
+            $("#itemList").val(items.join("\n")); // submit as text
+        }
+    });
+</script>
+
+
+
+
+

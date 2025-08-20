@@ -1,0 +1,53 @@
+﻿@model IEnumerable<FoodCollection.Models.BookPickupDetail>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityLeft)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExpiryDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookPickup)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FoodItem)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantityLeft)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpiryDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookPickup.BookPickupId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FoodItem.FoodItemId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BookPickupDetailId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BookPickupDetailId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BookPickupDetailId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
