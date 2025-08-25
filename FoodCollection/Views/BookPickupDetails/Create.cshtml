@@ -46,6 +46,7 @@
 }
  *@
 
+
 @model FoodCollection.Models.BookPickupDetail
 
 @{
@@ -55,6 +56,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
 
 <form asp-action="Create" method="post" id="foodForm">
+    <input type="hidden" asp-for="BookPickupId" id="BookPickupId" />
+
     <div class="row g-3 align-items-end">
         <div class="col-md-3">
             <label for="QuantityLeft" class="form-label">Quantity</label>
@@ -84,13 +87,11 @@
         </div>
     </div>
 
-    <!-- Textarea-like box (contenteditable div) -->
-    <div id="itemListBox" class="form-control mt-3" style="height:150px; overflow-y:auto;" contenteditable="false"></div>
+    <!-- List of items -->
+    <div id="itemListBox" class="form-control mt-3" style="height:150px; overflow-y:auto;"></div>
 
-    <!-- Hidden input for posting to controller -->
-    <input type="hidden" id="itemList" name="ItemList" />
-
-    <span class="text-muted small">List of food items added to the booking.</span>
+    <!-- Hidden container for list -->
+    <div id="hiddenInputs"></div>
 
     <div class="d-grid mt-4">
         <button type="submit" class="btn btn-success">
@@ -101,6 +102,8 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    var itemIndex = 0;
+
     $(document).ready(function () {
 
         $("#addItemBtn").click(function () {
@@ -108,47 +111,49 @@
             var exp = $("#ExpiryDate").val();
             var foodText = $("#FoodItemId option:selected").text();
             var foodVal = $("#FoodItemId").val();
+            var bookPickupId = $("#BookPickupId").val();
 
             if (!qty || !exp || !foodVal) {
                 alert("Please fill all fields before adding.");
                 return;
             }
 
-            // Create item row with remove button
+            // Display summary
             var itemHtml = `<div class="d-flex justify-content-between align-items-center border p-1 mb-1 bg-light">
                                 <span>${qty} - ${foodText} (Expiry: ${exp})</span>
-                                <button type="button" class="btn btn-sm btn-danger removeItem">
+                                <button type="button" class="btn btn-sm btn-danger removeItem" data-index="${itemIndex}">
                                     <i class="bi bi-x-circle"></i>
                                 </button>
                             </div>`;
 
             $("#itemListBox").append(itemHtml);
 
-            // Update hidden field for backend
-            updateHiddenInput();
+            // Hidden inputs for model binding
+            var hiddenHtml = `
+                <input type="hidden" name="details[${itemIndex}].BookPickupId" value="${bookPickupId}" />
+                <input type="hidden" name="details[${itemIndex}].QuantityLeft" value="${qty}" />
+                <input type="hidden" name="details[${itemIndex}].ExpiryDate" value="${exp}" />
+                <input type="hidden" name="details[${itemIndex}].FoodItemId" value="${foodVal}" />
+            `;
+            $("#hiddenInputs").append(`<div id="hidden-${itemIndex}">${hiddenHtml}</div>`);
 
-            // Clear inputs
+            itemIndex++;
+
+            // Clear fields
             $("#QuantityLeft").val("");
             $("#ExpiryDate").val("");
             $("#FoodItemId").val("");
         });
 
-        // Handle ❌ remove
+        // Remove item
         $(document).on("click", ".removeItem", function () {
+            var index = $(this).data("index");
+            $("#hidden-" + index).remove();
             $(this).closest("div").remove();
-            updateHiddenInput();
         });
-
-        // Update hidden input (plain text list)
-        function updateHiddenInput() {
-            var items = [];
-            $("#itemListBox span").each(function () {
-                items.push($(this).text());
-            });
-            $("#itemList").val(items.join("\n")); // submit as text
-        }
     });
 </script>
+
 
 
 

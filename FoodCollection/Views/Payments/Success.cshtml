@@ -1,7 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Payment Successful";
+    ViewData["Title"] = "Payment Successful";
 }
 
-<h2>Thank you for your payment!</h2>
-<p>Your transaction was completed successfully.</p>
-
+<div class="container mt-5 text-center">
+    <h2>🎉 Payment Successful!</h2>
+    <p>Your booking (ID: @ViewBag.BookPickupId) has been confirmed.</p>
+    <a asp-controller="BookPickups" asp-action="MyBookings" class="btn btn-outline-primary mt-3">
+        View My Bookings
+    </a>
+</div>

@@ -1,26 +1,19 @@
-﻿@{
-    ViewBag.Title = "Payment Confirmation";
+﻿
+@{
+    ViewData["Title"] = "Proceed to Payment";
 }
 
-<h2>Confirm Payment</h2>
-<p>Amount to pay: <strong>$@ViewBag.Amount</strong></p>
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Proceed to Payment</h2>
 
-<form id="payment-form">
-    <button id="checkout-button">Pay with Stripe</button>
-</form>
+    <div class="card shadow p-4 mx-auto" style="max-width: 400px;">
+        <p><strong>Amount:</strong> $@ViewBag.Amount</p>
 
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-    var stripe = Stripe('@ViewBag.PublishableKey');
-
-    document.getElementById('checkout-button').addEventListener('click', function (e) {
-        e.preventDefault();
-
-        fetch('/Payments/CreateCheckoutSession?paymentId=@ViewBag.PaymentId', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                return stripe.redirectToCheckout({ sessionId: data.id });
-            })
-            .catch(error => console.error('Error:', error));
-    });
-</script>
+        <form asp-action="CreateCheckoutSession" method="post">
+            <input type="hidden" name="bookPickupId" value="@ViewBag.BookPickupId" />
+            <button type="submit" class="btn btn-success w-100">
+                Pay with Stripe
+            </button>
+        </form>
+    </div>
+</div>

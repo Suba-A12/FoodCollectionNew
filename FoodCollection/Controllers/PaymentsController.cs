@@ -9,6 +9,7 @@ using FoodCollection.Data;
 using FoodCollection.Models;
 using Stripe;
 using Microsoft.Extensions.Options;
+using Stripe.Checkout;
 
 namespace FoodCollection.Controllers
 {
@@ -33,65 +34,85 @@ namespace FoodCollection.Controllers
         }
 
         // GET: Payments/Confirmation/{id}
-        public IActionResult Confirmation(int? id)
+        public IActionResult Confirmation(int bookPickupId)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            // Retrieve your payment entity to show summary/info if you wish
-            var payment = _context.Payment.FirstOrDefault(p => p.BookPickupId == id);
-            if (payment == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Amount = 35.00m;
-            ViewBag.PaymentId = payment.PaymentId;
-            ViewBag.PublishableKey = _stripeSettings.PublishableKey; // For Stripe.js usage
+            ViewBag.Amount = 35.00m;   // fixed price
+            ViewBag.BookPickupId = bookPickupId;
             return View();
         }
+        
         // POST: Payments/CreateCheckoutSession
         [HttpPost]
-        public async Task<IActionResult> CreateCheckoutSession(int paymentId)
+        public IActionResult CreateCheckoutSession(int bookPickupId)
         {
-            var options = new Stripe.Checkout.SessionCreateOptions
+            decimal amount = 35.00m; // fixed $35
+            var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
-                LineItems = new List<Stripe.Checkout.SessionLineItemOptions>
-        {
-            new Stripe.Checkout.SessionLineItemOptions
+                LineItems = new List<SessionLineItemOptions>
             {
-                PriceData = new Stripe.Checkout.SessionLineItemPriceDataOptions
+                new SessionLineItemOptions
                 {
+                    PriceData = new SessionLineItemPriceDataOptions
+                {
+                    UnitAmount = 3500, 
                     Currency = "sgd",
-                    UnitAmount = 3500, // Amount in cents
-                    ProductData = new Stripe.Checkout.SessionLineItemPriceDataProductDataOptions
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        Name = "Food Pickup Service"
+                        Name = "Food Donation Booking"
                     }
                 },
                 Quantity = 1
             }
-        },
+            },
                 Mode = "payment",
-                SuccessUrl = Url.Action("Success", "Payments", null, Request.Scheme),
-                CancelUrl = Url.Action("Confirmation", "Payments", new { id = paymentId }, Request.Scheme),
-            };
-            var service = new Stripe.Checkout.SessionService();
-            Stripe.Checkout.Session session = await service.CreateAsync(options);
+                SuccessUrl = Url.Action("Success", "Payments", new { bookPickupId }, Request.Scheme),
+                CancelUrl = Url.Action("Cancel", "Payments", new { bookPickupId }, Request.Scheme),
+        };
+            var service = new SessionService();
+            var session = service.Create(options);
 
-            return Json(new { id = session.Id });
+            return Redirect(session.Url); 
         }
-        public IActionResult Success()
+
+        public async Task<IActionResult> Success(int bookPickupId)
         {
-            return View();
-        }
+            var booking = await _context.BookPickup
+            .FirstOrDefaultAsync(b => b.BookPickupId == bookPickupId);
 
-        public IActionResult Cancel()
+            if (booking != null)
+            {
+                booking.PaymentStatus = "Paid";
+                booking.BookStatus = "Confirmed";
+
+                var payment = new Payment
+                {
+                    PaymentMethod = "Stripe",
+                    Amount = 35.00, 
+                    Date = DateOnly.FromDateTime(DateTime.Now),
+                    BookPickupId = bookPickupId
+                };
+
+                _context.Payment.Add(payment);
+                await _context.SaveChangesAsync();
+            }
+            ViewBag.BookPickupId = bookPickupId;
+            return View(); 
+        }
+        public async Task<IActionResult> Cancel(int bookPickupId)
         {
-            return View();
-        }
+            var booking = await _context.BookPickup
+            .FirstOrDefaultAsync(b => b.BookPickupId == bookPickupId);
 
+            if (booking != null)
+            {
+                booking.PaymentStatus = "Unpaid";
+                booking.BookStatus = "Pending";
+                await _context.SaveChangesAsync();
+            }
+            ViewBag.BookPickupId = bookPickupId;
+            return View(); 
+        }
 
         // GET: Payments/Details/5
         public async Task<IActionResult> Details(int? id)

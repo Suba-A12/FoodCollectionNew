@@ -69,49 +69,28 @@ namespace FoodCollection.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookPickupDetail bookPickupDetail, string ItemList)
+        public async Task<IActionResult> Create(List<BookPickupDetail> details)
         {
-            if (string.IsNullOrEmpty(ItemList))
+            if (details == null || !details.Any())
             {
                 ModelState.AddModelError("", "Please add at least one food item.");
-                ViewBag.FoodItemList = new SelectList(_context.FoodItem, "FoodItemId", "FoodType", bookPickupDetail.FoodItemId);
-                return View(bookPickupDetail);
+                return View(details); // or reload food items dropdown if needed
             }
-            // Split items (each line = one item)
-            var items = ItemList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var item in items)
+            foreach (var detail in details)
             {
-                // item looks like: "2 - Rice (Expiry: 2025-09-01)"
-                try
+                // Defensive check
+                if (detail.BookPickupId > 0 && detail.FoodItemId > 0 && detail.QuantityLeft > 0)
                 {
-                    // Extract parts (very basic parsing)
-                    var qtyPart = item.Split('-')[0].Trim();
-                    var rest = item.Split('-')[1].Trim();
-
-                    var foodName = rest.Substring(0, rest.IndexOf("(Expiry")).Trim();
-                    var expiryText = rest.Substring(rest.IndexOf(":") + 1).Replace(")", "").Trim();
-
-                    var newDetail = new BookPickupDetail
-                    {
-                        BookPickupId = bookPickupDetail.BookPickupId,
-                        QuantityLeft = int.Parse(qtyPart),
-                        ExpiryDate = DateOnly.Parse(expiryText),
-                        FoodItemId = _context.FoodItem
-                                            .Where(f => f.FoodType == foodName)
-                                            .Select(f => f.FoodItemId)
-                                            .FirstOrDefault()
-                    };
-                    _context.Add(newDetail);
-                }
-                catch
-                {
-                    // If parsing fails, skip or log
+                    _context.BookPickupDetail.Add(detail);
                 }
             }
+
             await _context.SaveChangesAsync();
-            return RedirectToAction("Confirmation", "Payments", new { bookPickupId = bookPickupDetail.BookPickupId });
+
+            return RedirectToAction("Confirmation", "Payments",
+                new { bookPickupId = details.First().BookPickupId });
         }
+
         //public async Task<IActionResult> Create([Bind("BookPickupDetailId,QuantityLeft,ExpiryDate,BookPickupId,FoodItemId")] BookPickupDetail bookPickupDetail)
         //{
         //    //if (ModelState.IsValid)

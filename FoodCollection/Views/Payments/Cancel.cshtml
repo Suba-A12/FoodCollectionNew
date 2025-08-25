@@ -2,5 +2,10 @@
     ViewBag.Title = "Payment Cancelled";
 }
 
-<h2>Payment Cancelled</h2>
-<p>Your payment was not completed. You can try again or contact support.</p>
+<div class="container mt-5 text-center">
+    <h2>❌ Payment Cancelled!</h2>
+<p>Your booking (ID: @ViewBag.BookPickupId) has been Cancelled.</p>
+<a asp-controller="BookPickups" asp-action="MyBookings" class="btn btn-outline-primary mt-3">
+    View My Bookings
+</a>
+</div>
