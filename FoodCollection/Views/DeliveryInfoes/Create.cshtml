@@ -1,4 +1,4 @@
-﻿@model FoodCollection.Models.DeliveryInfo
+﻿@* @model FoodCollection.Models.DeliveryInfo
 
 @{
     ViewData["Title"] = "Create";
@@ -43,4 +43,111 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+@* @model FoodCollection.Models.DeliveryInfo
+
+@{
+    ViewData["Title"] = "Assign Delivery";
+}
+
+<h2>Assign Delivery</h2>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Hidden PickupId -->
+            <input type="hidden" asp-for="PickupId" />
+
+            <div class="form-group">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="OrganizationId" class="control-label">Organization</label>
+                <select asp-for="OrganizationId" class="form-control" asp-items="ViewBag.OrganizationId"></select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DeliveryStatus" class="control-label"></label>
+                <input asp-for="DeliveryStatus" class="form-control" readonly value="Pending" />
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index">Back to List</a>
+</div> *@
+
+@model FoodCollection.Models.DeliveryInfo
+
+@{
+    ViewData["Title"] = "Assign Delivery";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between rounded-top-4">
+                    <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i> Assign Delivery</h5>
+                    <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Hidden PickupId -->
+                        <input type="hidden" asp-for="PickupId" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Date" class="form-label">Delivery Date</label>
+                                <input asp-for="Date" type="date" class="form-control" readonly />
+                                <span asp-validation-for="Date" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="OrganizationId" class="form-label">Organization</label>
+                                <select asp-for="OrganizationId" class="form-select" asp-items="ViewBag.OrganizationId"></select>
+                                <span asp-validation-for="OrganizationId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DeliveryStatus" class="form-label">Delivery Status</label>
+                                <input asp-for="DeliveryStatus" class="form-control" readonly value="Pending" />
+                                <span asp-validation-for="DeliveryStatus" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-save me-1"></i> Save Delivery
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

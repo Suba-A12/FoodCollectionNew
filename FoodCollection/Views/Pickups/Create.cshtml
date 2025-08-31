@@ -1,4 +1,4 @@
-﻿@model FoodCollection.Models.Pickup
+﻿@* @model FoodCollection.Models.Pickup
 
 @{
     ViewData["Title"] = "Create";
@@ -14,7 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
+                <input asp-for="Date" class="form-control" readonly />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -24,11 +24,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="BookPickupId" class="control-label"></label>
+                <input asp-for="BookPickupId" class="form-control" readonly />
+                <span asp-validation-for="BookPickupId" class="text-danger"></span>
                 <select asp-for="BookPickupId" class ="form-control" asp-items="ViewBag.BookPickupId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="StaffId" class="control-label"></label>
                 <select asp-for="StaffId" class ="form-control" asp-items="ViewBag.StaffId"></select>
+                <span asp-validation-for="StaffId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -43,4 +46,72 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+@model FoodCollection.Models.Pickup
+
+@{
+    ViewData["Title"] = "Create Pickup";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white d-flex align-items-center justify-content-between rounded-top-4">
+                    <h5 class="mb-0"><i class="bi bi-truck me-2"></i> Assign Pickup</h5>
+                    <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="BookPickupId" class="form-label">Booking ID</label>
+                                <input asp-for="BookPickupId" class="form-control" readonly />
+                                <span asp-validation-for="BookPickupId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Date" class="form-label">Pickup Date</label>
+                                <input asp-for="Date" type="date" class="form-control" readonly />
+                                <span asp-validation-for="Date" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="StaffId" class="form-label">Assign Staff</label>
+                                <select asp-for="StaffId" class="form-select" asp-items="ViewBag.StaffId"></select>
+                                <span asp-validation-for="StaffId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PickupStatus" class="form-label">Pickup Status</label>
+                                <input asp-for="PickupStatus" class="form-control" value="Assigned" readonly />
+                                <span asp-validation-for="PickupStatus" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="bi bi-person-check me-1"></i> Assign Staff
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

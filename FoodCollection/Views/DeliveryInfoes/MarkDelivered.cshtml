@@ -1,0 +1,72 @@
+﻿@model FoodCollection.Models.DeliveryInfo
+
+@{
+    ViewData["Title"] = "Mark Delivery";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white d-flex align-items-center justify-content-between rounded-top-4">
+                    <h5 class="mb-0"><i class="bi bi-check2-circle me-2"></i> Mark Delivery</h5>
+                    <a asp-action="MyDeliveries" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="MarkDelivered" method="post">
+                        <input type="hidden" asp-for="DelilveryInfoId" />
+
+                        <div class="row g-3">
+
+                            <!-- Pickup ID (read-only) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Pickup ID</label>
+                                <input class="form-control" value="@Model.PickupId" readonly />
+                            </div>
+
+                            <!-- Pickup Date (read-only) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Pickup Date</label>
+                                <input class="form-control" value="@Model.Date.ToString("yyyy-MM-dd")" readonly />
+                            </div>
+
+                            <!-- Organization (read-only for staff) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Organization</label>
+                                <input class="form-control" value="@Model.Organization.OrganizationName" readonly />
+                            </div>
+
+                            <!-- Delivery Status -->
+                            <div class="col-md-6">
+                                <label asp-for="DeliveryStatus" class="form-label">Delivery Status</label>
+                                <select asp-for="DeliveryStatus" class="form-select">
+                                    <option value="Pending" selected="@(Model.DeliveryStatus == "Pending")">Pending</option>
+                                    <option value="Delivered" selected="@(Model.DeliveryStatus == "Delivered")">Delivered</option>
+                                </select>
+                                <span asp-validation-for="DeliveryStatus" class="text-danger small"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="bi bi-check2-square me-1"></i> Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

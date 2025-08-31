@@ -19,6 +19,104 @@ namespace FoodCollection.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> MyDeliveries()
+        {
+            var userName = User.Identity.Name;
+
+            if (User.IsInRole("Staff"))
+            {
+                var staff = await _context.Staff.FirstOrDefaultAsync(s => s.Email == userName);
+                if (staff == null)
+                {
+                    return Unauthorized();
+                }
+            
+            var myDeliveries = await _context.DeliveryInfo
+                .Include(d => d.Pickup)
+                    .ThenInclude(p => p.BookPickup)
+                .Include(d => d.Organization)
+                .Where(d => d.Pickup.StaffId == staff.StaffId)
+                .ToListAsync();
+
+            return View(myDeliveries);
+        }
+            else if (User.IsInRole("SuperAdmin"))
+            {
+                // Admin sees ALL deliveries
+                var allDeliveries = await _context.DeliveryInfo
+                    .Include(d => d.Pickup)
+                        .ThenInclude(p => p.BookPickup)
+                    .Include(d => d.Organization)
+                    .ToListAsync();
+
+                return View(allDeliveries);
+            }
+
+            return Forbid();
+        }
+
+        // GET: DeliveryInfoes/MarkDelivered/5
+        [HttpGet]
+        public async Task<IActionResult> MarkDelivered(int id)
+        {
+            var delivery = await _context.DeliveryInfo
+                .Include(d => d.Organization)
+                .Include(d => d.Pickup)
+                .FirstOrDefaultAsync(d => d.DelilveryInfoId == id);
+
+            if (delivery == null)
+                return NotFound();
+
+            if (User.IsInRole("Staff"))
+            {
+                var staff = await _context.Staff.FirstOrDefaultAsync(s => s.Email == User.Identity.Name);
+                if (staff == null || delivery.Pickup.StaffId != staff.StaffId)
+                {
+                    return Forbid(); 
+                }
+            }
+
+            return View(delivery);
+        }
+
+        // POST: DeliveryInfoes/MarkDelivered/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkDelivered(int id, DeliveryInfo model)
+        {
+            {
+                var delivery = await _context.DeliveryInfo
+                    .Include(d => d.Pickup)
+                    .FirstOrDefaultAsync(d => d.DelilveryInfoId == id);
+
+                if (delivery == null)
+                    return NotFound();
+
+                if (User.IsInRole("Staff"))
+                {
+                    var staff = await _context.Staff.FirstOrDefaultAsync(s => s.Email == User.Identity.Name);
+                    if (staff == null || delivery.Pickup.StaffId != staff.StaffId)
+                    {
+                        return Forbid(); 
+                    }
+
+                    // Staff can ONLY update DeliveryStatus
+                    delivery.DeliveryStatus = model.DeliveryStatus;
+                }
+                else
+                {
+                    // Admin can update all fields if you allow
+                    delivery.DeliveryStatus = model.DeliveryStatus;
+                    delivery.OrganizationId = model.OrganizationId;
+                    delivery.Date = model.Date;
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Redirect staff to MyDeliveries, admin to Index
+                return User.IsInRole("Staff") ? RedirectToAction("MyDeliveries") : RedirectToAction("Index");
+            }
+        }
         // GET: DeliveryInfoes
         public async Task<IActionResult> Index()
         {
@@ -47,11 +145,27 @@ namespace FoodCollection.Controllers
         }
 
         // GET: DeliveryInfoes/Create
-        public IActionResult Create()
+        public IActionResult Create(int pickupId)
         {
-            ViewData["OrganizationId"] = new SelectList(_context.Organization, "OrganizationId", "OrganizationId");
-            ViewData["PickupId"] = new SelectList(_context.Pickup, "PickupId", "PickupId");
-            return View();
+            var pickup = _context.Pickup
+        .Include(p => p.BookPickup)
+        .FirstOrDefault(p => p.PickupId == pickupId);
+
+            if (pickup == null) return NotFound();
+
+            var delivery = new DeliveryInfo
+            {
+                PickupId = pickup.PickupId,
+                Date = DateOnly.FromDateTime(pickup.Date.ToDateTime(TimeOnly.MinValue)), // auto from pickup.BookDate
+                DeliveryStatus = "Pending"
+            };
+
+            ViewData["OrganizationId"] = new SelectList(_context.Organization, "OrganizationId", "OrganizationName");
+
+            return View(delivery);
+            //ViewData["OrganizationId"] = new SelectList(_context.Organization, "OrganizationId", "OrganizationId");
+            //ViewData["PickupId"] = new SelectList(_context.Pickup, "PickupId", "PickupId");
+            //return View();
         }
 
         // POST: DeliveryInfoes/Create
@@ -61,14 +175,14 @@ namespace FoodCollection.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DelilveryInfoId,Date,DeliveryStatus,PickupId,OrganizationId")] DeliveryInfo deliveryInfo)
         {
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 _context.Add(deliveryInfo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["OrganizationId"] = new SelectList(_context.Organization, "OrganizationId", "OrganizationId", deliveryInfo.OrganizationId);
-            ViewData["PickupId"] = new SelectList(_context.Pickup, "PickupId", "PickupId", deliveryInfo.PickupId);
+            //ViewData["PickupId"] = new SelectList(_context.Pickup, "PickupId", "PickupId", deliveryInfo.PickupId);
             return View(deliveryInfo);
         }
 

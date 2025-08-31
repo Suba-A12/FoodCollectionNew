@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class PickupsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -47,11 +49,27 @@ namespace FoodCollection.Controllers
         }
 
         // GET: Pickups/Create
-        public IActionResult Create()
+        public IActionResult Create(int? bookPickupId)
         {
-            ViewData["BookPickupId"] = new SelectList(_context.BookPickup, "BookPickupId", "BookPickupId");
-            ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId");
-            return View();
+            var pickup = new Pickup();
+
+            if (bookPickupId.HasValue)
+            {
+                var booking = _context.BookPickup.FirstOrDefault(b => b.BookPickupId == bookPickupId.Value);
+
+                if (booking != null)
+                {
+                    pickup.BookPickupId = booking.BookPickupId;
+                    pickup.Date = booking.BookDate; 
+                    pickup.PickupStatus = "Assigned"; 
+                }
+            }
+            ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "Fname");  // Show staff First Name instead of ID
+            return View(pickup);
+
+            //ViewData["BookPickupId"] = new SelectList(_context.BookPickup, "BookPickupId", "BookPickupId", bookPickupId);
+            //ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId");
+            //return View();
         }
 
         // POST: Pickups/Create
@@ -61,12 +79,13 @@ namespace FoodCollection.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PickupId,Date,PickupStatus,BookPickupId,StaffId")] Pickup pickup)
         {
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 _context.Add(pickup);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            //return RedirectToAction(nameof(Index));
+            return RedirectToAction("Create", "DeliveryInfoes", new { pickupId = pickup.PickupId });
+            //}
             ViewData["BookPickupId"] = new SelectList(_context.BookPickup, "BookPickupId", "BookPickupId", pickup.BookPickupId);
             ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId", pickup.StaffId);
             return View(pickup);

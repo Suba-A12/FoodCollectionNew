@@ -74,11 +74,10 @@ namespace FoodCollection.Controllers
             if (details == null || !details.Any())
             {
                 ModelState.AddModelError("", "Please add at least one food item.");
-                return View(details); // or reload food items dropdown if needed
+                return View(details); 
             }
             foreach (var detail in details)
             {
-                // Defensive check
                 if (detail.BookPickupId > 0 && detail.FoodItemId > 0 && detail.QuantityLeft > 0)
                 {
                     _context.BookPickupDetail.Add(detail);

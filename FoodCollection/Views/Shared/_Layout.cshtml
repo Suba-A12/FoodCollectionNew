@@ -91,7 +91,7 @@
                                 <i class="bi bi-shield-lock-fill me-1"></i> Privacy
                             </a>
                         </li>
-                        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Staff"))
+                        @if (User.IsInRole("SuperAdmin"))
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -108,9 +108,33 @@
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Payments" asp-action="Index"><i class="bi bi-credit-card-2-front-fill me-2"></i>Manage Payment</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Pickups" asp-action="Index"><i class="bi bi-box-seam me-2"></i>Manage Pickup</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="DeliveryInfoes" asp-action="Index"><i class="bi bi-truck-flatbed me-2"></i>Manage DeliveryInfo</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="DeliveryInfoes" asp-action="MyDeliveries"><i class="bi bi-truck-flatbed me-2"></i>Delivery List</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="Index"><i class="bi bi-bar-chart-fill me-2"></i>Manage Report</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="RolesAdmin" asp-action="Index"><i class="bi bi-person-gear me-2"></i>RolesAdmin</a></li>
                                 </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("Staff"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-gear-fill"></i> View
+                                </a>
+                                <ul class="dropdown-menu shadow border-0 rounded-3 mt-2">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Customers" asp-action="Index"><i class="bi bi-people-fill me-2"></i>Manage Customers</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Staffs" asp-action="Index"><i class="bi bi-person-badge-fill me-2"></i>Manage Staff</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="BookPickups" asp-action="Index"><i class="bi bi-truck me-2"></i>Manage BookPickup</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Appointments" asp-action="Index"><i class="bi bi-calendar-check-fill me-2"></i>Manage Appointment</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="BookPickupDetails" asp-action="Index"><i class="bi bi-list-ul me-2"></i>Manage BookPickupDetail</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="FoodItems" asp-action="Index"><i class="bi bi-basket-fill me-2"></i>Manage FoodItem</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Organizations" asp-action="Index"><i class="bi bi-building me-2"></i>Manage Organization</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="Index"><i class="bi bi-bar-chart-fill me-2"></i>Manage Report</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="DeliveryInfoes" asp-action="MyDeliveries">
+                                    <i class="bi bi-person-circle me-1"></i> Delivery List
+                                </a>
                             </li>
                         }
                         @if (User.IsInRole("Customer"))

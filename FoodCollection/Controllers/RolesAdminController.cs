@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "SuperAdmin")]
     public class RolesAdminController : Controller
     {
         private readonly ApplicationDbContext _context;
