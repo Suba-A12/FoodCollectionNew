@@ -28,7 +28,7 @@ namespace FoodCollection.Controllers
                 var staff = await _context.Staff.FirstOrDefaultAsync(s => s.Email == userName);
                 if (staff == null)
                 {
-                    return Unauthorized();
+                    return View(new List<DeliveryInfo>());
                 }
             
             var myDeliveries = await _context.DeliveryInfo
@@ -38,8 +38,9 @@ namespace FoodCollection.Controllers
                 .Where(d => d.Pickup.StaffId == staff.StaffId)
                 .ToListAsync();
 
-            return View(myDeliveries);
-        }
+                //return View(myDeliveries);
+                return View(myDeliveries ?? new List<DeliveryInfo>());
+            }
             else if (User.IsInRole("SuperAdmin"))
             {
                 // Admin sees ALL deliveries

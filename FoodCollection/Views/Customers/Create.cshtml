@@ -1,12 +1,12 @@
 ﻿@model FoodCollection.Models.Customer
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "My Profile";
 }
 
-<h1>Create</h1>
+<h1>My Profile</h1>
 
-<h4>Customer</h4>
+@* <h4>Customer</h4> *@
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -44,9 +44,9 @@
     </div>
 </div>
 
-<div>
+@* <div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

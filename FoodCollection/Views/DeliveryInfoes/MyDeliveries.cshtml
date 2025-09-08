@@ -1,5 +1,4 @@
-﻿
-@model IEnumerable<FoodCollection.Models.DeliveryInfo>
+﻿@model IEnumerable<FoodCollection.Models.DeliveryInfo>
 
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
@@ -23,32 +22,44 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @if (!Model.Any())
                 {
                     <tr>
-                        <td>@item.Pickup.Date.ToString("yyyy-MM-dd")</td>
-                        <td>@item.Pickup.BookPickup.EventName</td>
-                        <td>@item.Pickup.BookPickup.EventAddress</td>
-                        <td>@item.Organization.OrganizationName</td>
-                        <td>@item.Organization.Address</td>
-                        <td>
-                            <span class="badge bg-@(item.DeliveryStatus == "Delivered" ? "success" : "warning")">
-                                @item.DeliveryStatus
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            @if (item.DeliveryStatus == "Pending")
-                            {
-                                <a asp-action="MarkDelivered" asp-route-id="@item.DelilveryInfoId" class="btn btn-sm btn-outline-success" title="Mark Delivered">
-                                    <i class="bi bi-check2"></i> Delivered
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="text-muted">No Action</span>
-                            }
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            No deliveries assigned yet.
                         </td>
                     </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Pickup.Date.ToString("yyyy-MM-dd")</td>
+                            <td>@item.Pickup.BookPickup.EventName</td>
+                            <td>@item.Pickup.BookPickup.EventAddress</td>
+                            <td>@item.Organization.OrganizationName</td>
+                            <td>@item.Organization.Address</td>
+                            <td>
+                                <span class="badge bg-@(item.DeliveryStatus == "Delivered" ? "success" : "warning")">
+                                    @item.DeliveryStatus
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (item.DeliveryStatus == "Pending")
+                                {
+                                    <a asp-action="MarkDelivered" asp-route-id="@item.DelilveryInfoId" class="btn btn-sm btn-outline-success" title="Mark Delivered">
+                                        <i class="bi bi-check2"></i> Delivered
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No Action</span>
+                                }
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

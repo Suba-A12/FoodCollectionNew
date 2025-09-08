@@ -8,25 +8,31 @@ using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace FoodCollection.Controllers
 {
     public class CustomersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public CustomersController(ApplicationDbContext context)
+        public CustomersController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
-
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> MyProfile()
         {
             string username = User.Identity.Name;
-            var getProfile = await _context.Customer.Where(c => c.Email == username).FirstOrDefaultAsync();
+            var getProfile = _context.Customer.Where(c => c.Email == username).FirstOrDefault();
             return View(getProfile);
         }
         // GET: Customers
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Customer.ToListAsync());
@@ -65,10 +71,24 @@ namespace FoodCollection.Controllers
         {
             //if (ModelState.IsValid)
             //{
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //_context.Add(customer);
+                //await _context.SaveChangesAsync();
+                //return RedirectToAction(nameof(Index));
             //}
+            _context.Add(customer);
+            var custUserId = _context.Users.Where(u => u.Email == customer.Email).FirstOrDefault().Id;
+            var custRoleId = _context.Roles.Where(r => r.Name == "Customer").FirstOrDefault().Id;
+            var roleName = _context.Roles.Where(r => r.Name == "Customer").FirstOrDefault().Name;
+
+            var userRole = new IdentityUserRole<string>
+            {
+                UserId = custUserId,
+                RoleId = custRoleId
+            };
+            _context.UserRoles.Add(userRole);
+            await _context.SaveChangesAsync();
+            return Redirect("/Identity/Account/Login");
+
             return View(customer);
         }
 
