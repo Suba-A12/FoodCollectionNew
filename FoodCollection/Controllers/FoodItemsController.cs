@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
@@ -93,8 +94,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(foodItem);
@@ -112,11 +113,12 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             return View(foodItem);
         }
 
         // GET: FoodItems/Delete/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +139,7 @@ namespace FoodCollection.Controllers
         // POST: FoodItems/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var foodItem = await _context.FoodItem.FindAsync(id);

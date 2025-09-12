@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
@@ -66,6 +67,7 @@ namespace FoodCollection.Controllers
         }
 
         // GET: Organizations/Edit/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +88,7 @@ namespace FoodCollection.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("OrganizationId,OrganizationName,Email,Phone,Address")] Organization organization)
         {
             if (id != organization.OrganizationId)
@@ -93,8 +96,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(organization);
@@ -112,11 +115,12 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             return View(organization);
         }
 
         // GET: Organizations/Delete/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +141,7 @@ namespace FoodCollection.Controllers
         // POST: Organizations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var organization = await _context.Organization.FindAsync(id);

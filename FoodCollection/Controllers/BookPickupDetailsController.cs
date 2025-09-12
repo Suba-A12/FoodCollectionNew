@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
@@ -106,6 +107,7 @@ namespace FoodCollection.Controllers
         //}
 
         // GET: BookPickupDetails/Edit/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -128,6 +130,7 @@ namespace FoodCollection.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("BookPickupDetailId,QuantityLeft,ExpiryDate,BookPickupId,FoodItemId")] BookPickupDetail bookPickupDetail)
         {
             if (id != bookPickupDetail.BookPickupDetailId)
@@ -135,8 +138,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(bookPickupDetail);
@@ -154,13 +157,14 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["BookPickupId"] = new SelectList(_context.BookPickup, "BookPickupId", "BookPickupId", bookPickupDetail.BookPickupId);
             ViewData["FoodItemId"] = new SelectList(_context.FoodItem, "FoodItemId", "FoodItemId", bookPickupDetail.FoodItemId);
             return View(bookPickupDetail);
         }
 
         // GET: BookPickupDetails/Delete/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -183,6 +187,7 @@ namespace FoodCollection.Controllers
         // POST: BookPickupDetails/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var bookPickupDetail = await _context.BookPickupDetail.FindAsync(id);

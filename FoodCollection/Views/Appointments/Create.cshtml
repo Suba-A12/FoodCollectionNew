@@ -66,9 +66,6 @@
             <div class="card shadow-lg border-0 rounded-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
                     <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Create Appointment</h5>
-                    <a asp-action="Index" class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-arrow-left"></i> Back
-                    </a>
                 </div>
                 <div class="card-body p-4">
                     <form asp-action="Create" novalidate>
@@ -89,22 +86,22 @@
 
                             <div class="col-md-6">
                                 <label asp-for="Status" class="form-label">Status</label>
-                                <input asp-for="Status" class="form-control" placeholder="e.g., Scheduled" />
+                                <input asp-for="Status" class="form-control" value="Confirmed" disabled />
                                 <span asp-validation-for="Status" class="text-danger small"></span>
                             </div>
 
-                            <div class="col-md-6">
+                            @* <div class="col-md-6">
                                 <label asp-for="CustomerId" class="form-label">Customer</label>
                                 <select asp-for="CustomerId" class="form-select" asp-items="ViewBag.CustomerId"></select>
                                 <span asp-validation-for="CustomerId" class="text-danger small"></span>
-                            </div>
+                            </div> *@
 
-							@*  <input type="hidden" asp-for="StaffId" />  *@
-                              <div class="col-md-6">
+                            <div class="col-md-6">
                                 <label asp-for="StaffId" class="form-label">Staff</label>
-                                <select asp-for="StaffId" class="form-select" asp-items="ViewBag.StaffId"></select>
+                                <select asp-for="StaffId" class="form-select" readonly disabled><option value="1">1</option></select>
+                                <input type="hidden" asp-for="StaffId" value="1" />
                                 <span asp-validation-for="StaffId" class="text-danger small"></span>
-                            </div> 
+                            </div>
                         </div>
 
                         <div class="d-grid mt-4">

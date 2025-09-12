@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
@@ -54,8 +55,8 @@ namespace FoodCollection.Controllers
         // GET: Appointments/Create
         public IActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId");
-            ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId");
+            //ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId");
+            //ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId");
             return View();
         }
 
@@ -68,16 +69,31 @@ namespace FoodCollection.Controllers
         {
             //if (ModelState.IsValid)
             //{
-                _context.Add(appointment);
+            var userEmail = User.Identity.Name;
+            var customer = await _context.Customer
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            if (customer == null)
+            {
+                ModelState.AddModelError("", "Customer not found.");
+                return View(appointment);
+            }
+
+            appointment.CustomerId = customer.CustomerId;
+
+            appointment.StaffId = 1;
+            appointment.Status = "Confirmed";
+            _context.Add(appointment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(MyAppointments));
             //}
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", appointment.CustomerId);
-            ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId", appointment.StaffId);
+            //ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", appointment.CustomerId);
+            //ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId", appointment.StaffId);
             return View(appointment);
         }
 
         // GET: Appointments/Edit/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -100,6 +116,7 @@ namespace FoodCollection.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("AppointmentId,Date,Time,Status,CustomerId,StaffId")] Appointment appointment)
         {
             if (id != appointment.AppointmentId)
@@ -107,8 +124,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(appointment);
@@ -126,13 +143,14 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", appointment.CustomerId);
             ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId", appointment.StaffId);
             return View(appointment);
         }
 
         // GET: Appointments/Delete/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -155,6 +173,7 @@ namespace FoodCollection.Controllers
         // POST: Appointments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var appointment = await _context.Appointment.FindAsync(id);

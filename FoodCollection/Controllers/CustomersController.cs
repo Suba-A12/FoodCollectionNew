@@ -32,7 +32,7 @@ namespace FoodCollection.Controllers
             return View(getProfile);
         }
         // GET: Customers
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Customer.ToListAsync());
@@ -120,8 +120,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(customer);
@@ -139,7 +139,7 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             return View(customer);
         }
 

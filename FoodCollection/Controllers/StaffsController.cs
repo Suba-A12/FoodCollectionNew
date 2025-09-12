@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
@@ -18,8 +19,21 @@ namespace FoodCollection.Controllers
         {
             _context = context;
         }
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> Profile()
+        {
+            string username = User.Identity.Name; 
+            var staffProfile = _context.Staff.FirstOrDefault(s => s.Email == username);
 
+            if (staffProfile == null)
+            {
+                return NotFound();
+            }
+
+            return View(staffProfile);
+        }
         // GET: Staffs
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Staff.ToListAsync());
@@ -93,8 +107,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(staff);
@@ -112,7 +126,7 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             return View(staff);
         }
 

@@ -98,8 +98,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(report);
@@ -117,7 +117,7 @@ namespace FoodCollection.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["StaffId"] = new SelectList(_context.Staff, "StaffId", "StaffId", report.StaffId);
             return View(report);
         }

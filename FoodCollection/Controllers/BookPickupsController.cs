@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FoodCollection.Data;
 using FoodCollection.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCollection.Controllers
 {
@@ -24,6 +25,7 @@ namespace FoodCollection.Controllers
             var getBookings = await _context.BookPickup.Include(b => b.Customer).Where(b => b.Customer.Email == username).ToListAsync();
             return View(getBookings);
         }
+
         // GET: BookPickups
         public async Task<IActionResult> Index()
         {
@@ -53,7 +55,7 @@ namespace FoodCollection.Controllers
         // GET: BookPickups/Create
         public IActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId");
+            //ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId");
             return View();
         }
 
@@ -66,16 +68,29 @@ namespace FoodCollection.Controllers
         {
             //if (ModelState.IsValid)
             //{
-                _context.Add(bookPickup);
-                await _context.SaveChangesAsync();
-            //return RedirectToAction(nameof(Index));
-            return RedirectToAction("Create", "BookPickupDetails", new { bookPickupId = bookPickup.BookPickupId });
+            //    _context.Add(bookPickup);
+            //    await _context.SaveChangesAsync();
+            //    return RedirectToAction(nameof(Index));
+            //    return RedirectToAction("Create", "BookPickupDetails", new { bookPickupId = bookPickup.BookPickupId });
             //}
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", bookPickup.CustomerId);
-            return View(bookPickup);
+            //ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", bookPickup.CustomerId);
+            //return View(bookPickup);
+
+            var username = User.Identity.Name;
+            var customer = await _context.Customer.FirstOrDefaultAsync(c => c.Email == username);
+            if (customer == null)
+            {
+                return Unauthorized(); 
+            }
+            bookPickup.CustomerId = customer.CustomerId; 
+
+            _context.Add(bookPickup);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Create", "BookPickupDetails", new { bookPickupId = bookPickup.BookPickupId });
         }
 
         // GET: BookPickups/Edit/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -95,6 +110,7 @@ namespace FoodCollection.Controllers
         // POST: BookPickups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BookPickupId,EventName,EventAddress,BookDate,BookTime,BookStatus,TotalAmount,PaymentStatus,CustomerId")] BookPickup bookPickup)
@@ -104,8 +120,8 @@ namespace FoodCollection.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(bookPickup);
@@ -121,7 +137,7 @@ namespace FoodCollection.Controllers
                     {
                         throw;
                     }
-                }
+                //}
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", bookPickup.CustomerId);
@@ -129,6 +145,7 @@ namespace FoodCollection.Controllers
         }
 
         // GET: BookPickups/Delete/5
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,6 +167,7 @@ namespace FoodCollection.Controllers
         // POST: BookPickups/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var bookPickup = await _context.BookPickup.FindAsync(id);
