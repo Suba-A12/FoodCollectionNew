@@ -22,10 +22,44 @@ namespace FoodCollection.Controllers
         // GET: Reports
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Report.Include(r => r.Staff);
-            return View(await applicationDbContext.ToListAsync());
+            //var applicationDbContext = _context.Report.Include(r => r.Staff);
+            //return View(await applicationDbContext.ToListAsync());
+            var reportVM = new ReportVM
+            {
+                MonthlyRevenue = GetMonthlyRevenue(),
+                PopularFood = GetPopularFood()
+            };
+            reportVM.TotalRevenue = reportVM.MonthlyRevenue.Sum(m => m.Amount);
+            return View(reportVM);
         }
+        private List<MonthlyRevenueVM> GetMonthlyRevenue()
+        {
+            // Fetch data from DB first
+            var payments = _context.Payment
+                .AsEnumerable() 
+                .GroupBy(p => new { p.Date.Year, p.Date.Month })
+                .Select(g => new MonthlyRevenueVM
+                {
+                    Month = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMM yyyy"),
+                    Amount = (decimal)g.Sum(p => p.Amount) 
+                })
+                .OrderBy(r => r.Month)
+                .ToList();
 
+            return payments;
+        }
+        private List<FoodItemVM> GetPopularFood()
+        {
+            return _context.BookPickupDetail
+                .GroupBy(b => b.FoodItemId)
+                .Select(g => new FoodItemVM
+                {
+                    FoodItemId = g.Key,
+                    CountFoodItem = g.Count(),
+                })
+                .OrderByDescending(f => f.CountFoodItem)
+                .ToList();
+        }
         // GET: Reports/Details/5
         public async Task<IActionResult> Details(int? id)
         {

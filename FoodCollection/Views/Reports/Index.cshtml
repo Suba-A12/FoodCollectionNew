@@ -1,4 +1,4 @@
-﻿@model IEnumerable<FoodCollection.Models.Report>
+﻿@* @model IEnumerable<FoodCollection.Models.Report>
 
 @{
     ViewData["Title"] = "Index";
@@ -45,3 +45,150 @@
 }
     </tbody>
 </table>
+ *@
+
+@model FoodCollection.Models.ReportVM
+
+@{
+    ViewData["Title"] = "Reports";
+    //Revenue chart
+    var monthLabels = string.Join(",", Model.MonthlyRevenue.Select(m => $"'{m.Month}'"));
+    var revenueData = string.Join(",", Model.MonthlyRevenue.Select(m => m.Amount));
+
+    //Popular food chart
+    var foodTypes = string.Join(",", Model.PopularFood.Select(f => $"'{f.FoodItemId}'"));
+    var foodCounts = string.Join(",", Model.PopularFood.Select(f => f.CountFoodItem));
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .revenueChartStyle {
+            top: 220px;
+            left: 50px;
+            height: 350px;
+            width: 600px;
+            border: solid 1px;
+            border-radius: 5px;
+            position: absolute;
+            padding: 10px;
+        }
+
+        .foodChartStyle {
+            top: 220px;
+            left: 700px;
+            height: 350px;
+            width: 600px;
+            border: solid 1px;
+            border-radius: 5px;
+            position: absolute;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+        <h2>Total Revenue</h2>
+        <h3>$@Model.TotalRevenue</h3>
+    <!--Revenue Chart-->
+    <div class="revenueChartStyle">
+        <h3>Monthly Revenue</h3>
+        <canvas id="revenueChart"></canvas>
+
+        <script>
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(ctxRevenue, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(monthLabels)],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [@Html.Raw(revenueData)],
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monthly Revenue'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Revenue ($)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+
+    <!--Popular Food Chart-->
+    <div class="foodChartStyle">
+        <h3>Popular Food</h3>
+        <canvas id="foodChart"></canvas>
+
+        <script>
+            const ctxFood = document.getElementById('foodChart').getContext('2d');
+            const foodChart = new Chart(ctxFood, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(foodTypes)],
+                    datasets: [{
+                        label: 'Times Added',
+                        data: [@Html.Raw(foodCounts)],
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Most Popular Food Types'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'FoodItem Id'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
