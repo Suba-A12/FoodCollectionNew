@@ -27,7 +27,8 @@ namespace FoodCollection.Controllers
             var reportVM = new ReportVM
             {
                 MonthlyRevenue = GetMonthlyRevenue(),
-                PopularFood = GetPopularFood()
+                PopularFood = GetPopularFood(),
+                OrganizationStatus = GetOrganizationStatus()
             };
             reportVM.TotalRevenue = reportVM.MonthlyRevenue.Sum(m => m.Amount);
             return View(reportVM);
@@ -48,16 +49,38 @@ namespace FoodCollection.Controllers
 
             return payments;
         }
-        private List<FoodItemVM> GetPopularFood()
+        private List<PopularFoodVM> GetPopularFood()
         {
             return _context.BookPickupDetail
-                .GroupBy(b => b.FoodItemId)
-                .Select(g => new FoodItemVM
+                .Join(
+                    _context.FoodItem,
+                    detail => detail.FoodItemId,
+                    food => food.FoodItemId,
+                    (detail, food) => new { detail, food }
+                )
+                .GroupBy(x => new { x.food.FoodItemId, x.food.FoodType })
+                .Select(g => new PopularFoodVM
                 {
-                    FoodItemId = g.Key,
-                    CountFoodItem = g.Count(),
+                    FoodItemId = g.Key.FoodItemId,
+                    FoodType = g.Key.FoodType,
+                    CountFoodItem = g.Count()
                 })
                 .OrderByDescending(f => f.CountFoodItem)
+                .ToList();
+        }
+
+        private List<OrganizationPickupVM> GetOrganizationStatus()
+        {
+            return _context.DeliveryInfo   
+                .Include(d => d.Organization) 
+                .AsEnumerable()               
+                .GroupBy(d => d.Organization?.OrganizationName ?? "Unknown")
+                .Select(g => new OrganizationPickupVM
+                {
+                    OrganizationName = g.Key,
+                    PickupCount = g.Count()
+                })
+                .OrderByDescending(x => x.PickupCount)
                 .ToList();
         }
         // GET: Reports/Details/5

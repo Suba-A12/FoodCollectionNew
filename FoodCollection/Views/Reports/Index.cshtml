@@ -50,14 +50,16 @@
 @model FoodCollection.Models.ReportVM
 
 @{
-    ViewData["Title"] = "Reports";
-    //Revenue chart
+    ViewData["Title"] = "Reports Dashboard";
+
     var monthLabels = string.Join(",", Model.MonthlyRevenue.Select(m => $"'{m.Month}'"));
     var revenueData = string.Join(",", Model.MonthlyRevenue.Select(m => m.Amount));
 
-    //Popular food chart
-    var foodTypes = string.Join(",", Model.PopularFood.Select(f => $"'{f.FoodItemId}'"));
+    var foodTypes = string.Join(",", Model.PopularFood.Select(f => $"'{f.FoodType}'"));
     var foodCounts = string.Join(",", Model.PopularFood.Select(f => f.CountFoodItem));
+
+    var orgLabels = string.Join(",", Model.OrganizationStatus.Select(o => $"'{o.OrganizationName}'"));
+    var orgCounts = string.Join(",", Model.OrganizationStatus.Select(o => o.PickupCount));
 }
 <!DOCTYPE html>
 <html>
@@ -66,92 +68,117 @@
     <title>@ViewData["Title"]</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .revenueChartStyle {
-            top: 220px;
-            left: 50px;
-            height: 350px;
-            width: 600px;
-            border: solid 1px;
-            border-radius: 5px;
-            position: absolute;
-            padding: 10px;
+        html, body {
+            margin: 0;
+            padding: 0; 
+            height: 100%; 
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow-x: hidden; 
         }
 
-        .foodChartStyle {
-            top: 220px;
-            left: 700px;
-            height: 350px;
-            width: 600px;
-            border: solid 1px;
+        h1 {
+            margin: 10px 0 10px 0; 
+            padding-top: 40px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-buttons button {
+            padding: 10px 20px;
+            border: none;
             border-radius: 5px;
-            position: absolute;
-            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+            .tab-buttons button.active, .tab-buttons button:hover {
+                    background-color: #45a049;
+            }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            flex-direction: column;
+            margin: 0 auto;
+            max-width: 800px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px 15px;
+            background: #fafafa;
+        }
+
+        .chart-box {
+            display: none;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .chart-box.active {
+                display: block;
+            }
+
+        canvas {
+            max-width: 100%;
+            height: 300px !important;
         }
     </style>
 </head>
 <body>
-        <h2>Total Revenue</h2>
-        <h3>$@Model.TotalRevenue</h3>
-    <!--Revenue Chart-->
-    <div class="revenueChartStyle">
-        <h3>Monthly Revenue</h3>
-        <canvas id="revenueChart"></canvas>
+    <h1>Report Dashboard</h1>
 
-        <script>
-            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-            const revenueChart = new Chart(ctxRevenue, {
-                type: 'bar',
-                data: {
-                    labels: [@Html.Raw(monthLabels)],
-                    datasets: [{
-                        label: 'Revenue ($)',
-                        data: [@Html.Raw(revenueData)],
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Monthly Revenue'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Revenue ($)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Month'
-                            }
-                        }
-                    }
-                }
-            });
-        </script>
+    <div class="tab-buttons">
+        <button id="btnFood" onclick="showTab('food')">Most Popular Food Item</button>
+        <button id="btnRevenue" onclick="showTab('revenue')">Total Revenue</button>
+        <button id="btnOrg" onclick="showTab('org')">Most Organizations Received Food</button>
     </div>
 
-    <!--Popular Food Chart-->
-    <div class="foodChartStyle">
-        <h3>Popular Food</h3>
-        <canvas id="foodChart"></canvas>
+    <div class="chart-container" id="chartsContainer" style="display:none;">
+        <div id="food" class="chart-box">
+            <h3>Most Popular Food Items</h3>
+            <canvas id="foodChart"></canvas>
+        </div>
+        <div id="revenue" class="chart-box">
+            <h3>Total Revenue: $@Model.TotalRevenue</h3>
+            <canvas id="revenueChart"></canvas>
+        </div>
+        <div id="org" class="chart-box">
+            <h3>Most Organizations Received Food</h3>
+            <canvas id="orgChart"></canvas>
+        </div>
+    </div>
 
-        <script>
+    <script>
+        let chartsInitialized = false;
+
+        function showTab(tabId) {
+            const container = document.getElementById('chartsContainer');
+            container.style.display = 'block';
+            document.querySelectorAll('.chart-box').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
+
+            if (!chartsInitialized) {
+                initCharts();
+                chartsInitialized = true;
+            }
+        }
+
+        function initCharts() {
+            // Popular Food Chart
             const ctxFood = document.getElementById('foodChart').getContext('2d');
-            const foodChart = new Chart(ctxFood, {
+            new Chart(ctxFood, {
                 type: 'bar',
                 data: {
                     labels: [@Html.Raw(foodTypes)],
@@ -165,30 +192,66 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Most Popular Food Types'
-                        }
-                    },
+                    plugins: { title: { display: true, text: 'Most Popular Food Types' } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Count'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'FoodItem Id'
-                            }
-                        }
+                        y: { beginAtZero: true, title: { display: true, text: 'Count' } },
+                        x: { title: { display: true, text: 'Food Type' } }
                     }
                 }
             });
-        </script>
-    </div>
+
+            // Revenue Chart
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctxRevenue, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(monthLabels)],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [@Html.Raw(revenueData)],
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { title: { display: true, text: 'Monthly Revenue' } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Revenue ($)' },
+                            ticks: { callback: v => '$' + v.toLocaleString() }
+                        },
+                        x: { title: { display: true, text: 'Month' } }
+                    }
+                }
+            });
+
+            // Organization Chart
+            const ctxOrg = document.getElementById('orgChart').getContext('2d');
+            new Chart(ctxOrg, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(orgLabels)],
+                    datasets: [{
+                        label: 'Pickups',
+                        data: [@Html.Raw(orgCounts)],
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { title: { display: true, text: 'Organizations Receiving Most Pickups' } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Pickups' } },
+                        x: { title: { display: true, text: 'Organization' } }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
