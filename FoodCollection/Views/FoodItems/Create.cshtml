@@ -1,4 +1,4 @@
-﻿@model FoodCollection.Models.FoodItem
+﻿@* @model FoodCollection.Models.FoodItem
 
 @{
     ViewData["Title"] = "Create";
@@ -35,4 +35,55 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+@model FoodCollection.Models.FoodItem
+
+@{
+    ViewData["Title"] = "Create Food Item";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white d-flex align-items-center justify-content-between rounded-top-4">
+                    <h5 class="mb-0"><i class="bi bi-basket-fill me-2"></i>Create Food Item</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" asp-for="IsVegetarian" id="IsVegetarian" />
+                            <label class="form-check-label" asp-for="IsVegetarian">Vegetarian</label>
+                            <span asp-validation-for="IsVegetarian" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FoodType" class="form-label">Food Type</label>
+                            <input asp-for="FoodType" class="form-control" placeholder="Enter food type" />
+                            <span asp-validation-for="FoodType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="bi bi-save me-1"></i> Save Food Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
