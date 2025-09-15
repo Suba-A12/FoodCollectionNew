@@ -1,4 +1,4 @@
-﻿@model FoodCollection.Models.Customer
+﻿@* @model FoodCollection.Models.Customer
 
 @{
     ViewData["Title"] = "My Profile";
@@ -7,7 +7,7 @@
 <h1>My Profile</h1>
 
 @* <h4>Customer</h4> *@
-<hr />
+@* <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
@@ -42,12 +42,80 @@
             </div>
         </form>
     </div>
-</div>
+</div> *@
 
 @* <div>
     <a asp-action="Index">Back to List</a>
 </div> *@
 
-@section Scripts {
+@* @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} *@
+
+@model FoodCollection.Models.Customer
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white d-flex align-items-center justify-content-between rounded-top-4">
+                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>My Profile</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Lname" class="form-label">Last Name</label>
+                                <input asp-for="Lname" class="form-control" placeholder="Enter your last name" />
+                                <span asp-validation-for="Lname" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Fname" class="form-label">First Name</label>
+                                <input asp-for="Fname" class="form-control" placeholder="Enter your first name" />
+                                <span asp-validation-for="Fname" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email address" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label">Phone</label>
+                                <input asp-for="Phone" type="tel" class="form-control" placeholder="Enter your phone number" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label">Address</label>
+                                <input asp-for="Address" class="form-control" placeholder="Enter your address" />
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="bi bi-save me-1"></i> Save Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
